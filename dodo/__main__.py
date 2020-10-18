@@ -8,7 +8,7 @@ import argparse
 import logging
 import sys
 
-from dodo import init
+from dodo import init, encrypt
 
 
 def main():
@@ -16,9 +16,9 @@ def main():
     parser.add_argument("--verbose", "-v", help="Verbose output", action="store_true")
     parser.add_argument("--quiet", "-q", help="Quiet (minimal output)", action="store_true")
     subparsers = parser.add_subparsers(help='Sub commands', dest='command')
-    subparsers.required=True
-    init_parser = subparsers.add_parser('init', help='Create a new compendium')
-    init.add_arguments(init_parser)
+    subparsers.required = True
+    init.add_subparser(subparsers)
+    encrypt.add_subparser(subparsers)
 
     if len(sys.argv) == 1:
         print(__doc__, file=sys.stderr)
@@ -27,8 +27,7 @@ def main():
     level = (logging.DEBUG if args.verbose else (logging.WARN if args.quiet else logging.INFO))
     logging.basicConfig(level=level, format='[%(levelname)-5s] %(message)s')
 
-    if args.command == "init":
-        init.init(args)
+    globals()[args.command].run(args)
 
 
 if __name__ == '__main__':

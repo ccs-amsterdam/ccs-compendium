@@ -9,14 +9,14 @@ import sys
 
 from setuptools import setup
 
-setup(name = 'compendium-dodo',
-      description = 'Compendium dodo - creating a compendium for reproducible science',
-      version = '0.0.1',
-      license = 'MIT',
-      author = 'Wouter van Atteveldt',
-      author_email = 'wouter@vanatteveldt.com',
-      url = 'http://github.com/ccs-amsterdam/compendium',
-      classifiers = [
+setup(name='compendium-dodo',
+      description='Compendium dodo - creating a compendium for reproducible science',
+      version='0.0.2',
+      license='MIT',
+      author='Wouter van Atteveldt',
+      author_email='wouter@vanatteveldt.com',
+      url='http://github.com/ccs-amsterdam/compendium',
+      classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
@@ -28,11 +28,11 @@ setup(name = 'compendium-dodo',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
         ],
-      packages = ['dodo'],
+      packages=['dodo'],
       python_requires='>=3.5',
-      install_requires = [],
-      long_description = __doc__,
-      entry_points = {
+      install_requires=["doit", "cryptography"],
+      long_description=__doc__,
+      entry_points={
           'console_scripts': [
               'dodo = dodo.__main__:main'
           ]

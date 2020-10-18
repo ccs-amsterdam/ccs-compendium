@@ -1,3 +1,7 @@
+"""
+Setup a new compendium folder
+"""
+
 import subprocess
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
@@ -9,12 +13,15 @@ def AbsolutePath(*args, **kargs):
     return Path(*args, **kargs).absolute()
 
 
-def add_arguments(parser: ArgumentParser):
-    parser.add_argument("folder", nargs="?", help="Name of the compendium folder (. or omit to use current folder)", type=AbsolutePath)
-    parser.add_argument("--python-env", nargs="?", help="Create a python virtual environment (specify name or usef default 'env')", type=AbsolutePath)
+def add_subparser(subparsers):
+    parser = subparsers.add_parser('init', help=__doc__)
+    parser.add_argument("folder", nargs="?", type=AbsolutePath,
+                        help="Name of the compendium folder (. or omit to use current folder)")
+    parser.add_argument("--python-env", nargs="?", type=AbsolutePath,
+                        help="Create a python virtual environment (specify name or usef default 'env')")
 
 
-def init(args: Namespace):
+def run(args: Namespace):
     get_interactive_arguments(args)
     if args.folder.exists():
         logging.info(f"Using compendium folder at {args.folder}")
@@ -39,8 +46,8 @@ def init(args: Namespace):
         cmd = f"python3 -m venv {args.python_env}"
         logging.debug(cmd)
         subprocess.check_call(cmd, shell=True)
-        logging.debug("Installing doit and compendium-dodo to virtual environment")
-        cmd = f"{args.python_env}/bin/pip install doit"
+        logging.debug("Installing compendium-dodo to virtual environment")
+        cmd = f"{args.python_env}/bin/pip install compendium-dodo"
         logging.debug(cmd)
         subprocess.check_call(cmd, shell=True)
 
