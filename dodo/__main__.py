@@ -7,6 +7,7 @@ Use `dodo --help` for a list of all available commands
 import argparse
 import logging
 import sys
+from argparse import Namespace
 
 from dodo import init, encrypt
 
