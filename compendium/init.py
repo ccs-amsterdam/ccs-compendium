@@ -12,26 +12,25 @@ from urllib.request import urlretrieve
 
 import requests
 
-from dodo.folderstructure import FolderStructureSegment
-from dodo.github import GithubSegment
-from dodo.segment import AbsolutePath, Segment, yesno
+from compendium.segment import AbsolutePath, Segment, yesno
 
 
 def add_subparser(subparsers):
     parser = subparsers.add_parser('init', help=__doc__)
-    for segment in SEGMENTS:
+    for segment in get_segments():
         segment.add_arguments(parser)
 
 
 def run(args: Namespace):
-    for segment in SEGMENTS:
+    for segment in get_segments():
         try:
             segment.check_arguments(args)
         except Exception as e:
             print(f"Invalid argument: {e}", file=sys.stderr)
-    for segment in SEGMENTS:
+    for segment in get_segments():
         segment.interactive_arguments(args)
         segment.run(args)
+
 
 
 
@@ -45,6 +44,7 @@ def find_env(location: Path):
 
 class PyEnvSegment(Segment):
     ARGS = ["python_env"]
+
     def add_arguments(self, parser: ArgumentParser):
         parser.add_argument("--python-env", nargs="?", type=AbsolutePath,
                             help="Create a python virtual environment (specify name or usef default 'env')")
@@ -72,27 +72,13 @@ class PyEnvSegment(Segment):
                 env = input("Name of the folder (or leave empty to use 'env'): ").strip()
                 args.python_env = args.folder / (env or "env")
 
-
-
-
-
-
-SEGMENTS = [
-    GithubSegment(),
-    FolderStructureSegment(),
-    PyEnvSegment(),
-]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def get_segments():
+    from compendium.check import CheckSegment
+    from compendium.folderstructure import FolderStructureSegment
+    from compendium.github import GithubSegment
+    return [
+        GithubSegment(),
+        FolderStructureSegment(),
+        PyEnvSegment(),
+        CheckSegment(),
+    ]

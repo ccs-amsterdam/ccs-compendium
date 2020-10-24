@@ -33,15 +33,15 @@ def get_root(folder: Optional[Path]):
         folder = Path.cwd()
     folders = [folder] + list(folder.absolute().parents)
     for folder in folders:
-        if (folder / ".dodo.cfg").exists():
+        if (folder / ".compendium.cfg").exists():
             logging.debug(f"Using compendium folder at {folder}")
             return folder
-    raise FileNotFoundError(f"Could not find compendium folder, looked for .dodo.cfg in {folders}")
+    raise FileNotFoundError(f"Could not find compendium folder, looked for .compendium.cfg in {folders}")
 
 
 def get_config(folder: Path):
     cf = ConfigParser()
-    cf.read(folder/".dodo.cfg")
+    cf.read(folder/".compendium.cfg")
     return cf
 
 

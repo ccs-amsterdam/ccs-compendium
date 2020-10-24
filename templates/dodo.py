@@ -183,21 +183,6 @@ def task_process():
             yield(result)
 
 
-def do_encrypt(args):
-    if args.files:
-        files = [Path(x).resolve() for x in  args.files]
-        for f in files:
-            if not f.parent == DATA_PRIVATE.resolve():
-                raise ValueError(f"File {f} not in {DATA_PRIVATE}, so will not be encrypted!")
-    else:
-        files = get_files(DATA_PRIVATE)
-    for file in files:
-        outfile = DATA_ENCRYPTED/f"{file.name}.gpg"
-        print(f"Encrypting {file} -> {outfile}")
-        cmd = ['gpg', '--yes', '--symmetric', '--batch', '--passphrase', args.passphrase, "-o", outfile, file]
-        subprocess.check_call(cmd)
-
-
 def document_readme() -> str:
     actions = list(get_actions())
     md = "# Data processing scripts"
@@ -300,77 +285,5 @@ def isCyclicUtil(self, v, visited, recStack):
     # Returns true if graph is cyclic else false
 
 
-def get_cycles(graph):
-    def cycles_node(graph, node, visited=None):
-        # Can I find a cycle in the depth-first graph starting from this node?
-        if visited is None:
-            visited = set()
-        for neighbour in graph.get(node, []):
-            #print(f"{node} -> {neighbour} (visited: {visited})")
-            if neighbour in visited:
-                yield neighbour
-            else:
-                visited.add(neighbour)
-                yield from cycles_node(graph, neighbour, visited)
-
-    # for any node, can you find a cycle?
-    for n in graph:
-        yield from cycles_node(graph, n)
 
 
-def do_check(args):
-    """
-    Run sanity checks on the package
-    """
-    logging.info("Checking consistency of dependency graph")
-    inputs, outputs, graph = set(), set(), defaultdict(set)
-    for action in get_actions():
-        inputs |= set(action.inputs)
-        outputs |= set(action.targets)
-        for output in action.targets:
-            for input in action.inputs:
-                graph[input].add(output)
-    errors = []
-    # check: all inputs need to be either in raw and exist, in private_raw, or in outputs
-    for input in inputs - outputs:
-        if contained_in(DATA_RAW, input):
-            errors.append(f"Input file {input} does not exist")
-        elif not contained_in(DATA_PRIVATE, input):
-            errors.append(f"Intermediate file {input} is not produced by any script")
-    # check that graph does not contain any cycles
-    cycles = set(get_cycles(graph))
-    for cycle in cycles:
-        errors.append(f"Cyclical dependency for file {cycle}")
-    if errors:
-        print("Package checking resulted in one or more errors:", file=sys.stderr)
-        for error in errors:
-            print(f"- {error}", file=sys.stderr)
-        sys.exit(1)
-
-
-if __name__ == '__main__':
-    import argparse
-    import sys
-    parser = argparse.ArgumentParser(description=__doc__)
-
-    subparsers = parser.add_subparsers(help='Action to perform')
-
-    encrypt = subparsers.add_parser('encrypt', help='Encrypt private files')
-    encrypt.add_argument('passphrase', help='Passphrase for encryption')
-    encrypt.add_argument('files', nargs="*", help='Files to encrypt (if blank, encrypt all private files)')
-    encrypt.set_defaults(func=do_encrypt)
-
-    document = subparsers.add_parser('document', help='Generate documentation')
-    document.add_argument('what', help='Which documentation to generate', choices=['process', 'readme'])
-    document.add_argument('--filename', '-f', help='Output file name')
-    document.add_argument('--overwrite', '-o', help='Overwrite files', action='store_true')
-    document.set_defaults(func=do_document)
-
-    check = subparsers.add_parser('check', help='Check consistency and run unit tests')
-    check.set_defaults(func=do_check)
-
-    if len(sys.argv) <= 1:
-        parser.print_help()
-    else:
-        args = parser.parse_args()
-        args.func(args)

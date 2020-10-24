@@ -1,9 +1,11 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
+from typing import Sequence, Tuple
 
 
 class Segment:
     ARGS = []
+
     def add_arguments(self, parser: ArgumentParser):
         pass
 
@@ -17,6 +19,9 @@ class Segment:
 
     def run(self, args: Namespace):
         pass
+
+    def check(self, args: Namespace) -> Sequence[Tuple[str, bool]]:
+        return []
 
 
 def AbsolutePath(*args, **kargs):
@@ -41,3 +46,6 @@ def yesno(prompt, default: bool=None, add_options=True):
     if result.startswith("n"):
         return False
     return yesno(prompt, default, add_options=False)
+
+
+

@@ -3,7 +3,7 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from urllib.request import urlretrieve
 
-from dodo.segment import Segment, yesno
+from compendium.segment import Segment, yesno
 
 
 def _download(fn: str, dest: Path):
@@ -14,6 +14,7 @@ def _download(fn: str, dest: Path):
 
 class FolderStructureSegment(Segment):
     ARGS=["dodofile", "gitignore", "license", "data"]
+
     def add_arguments(self, parser: ArgumentParser):
         parser.add_argument("--dodofile", nargs="?", const="yes", choices=["yes", "no"],
                             help="Download the dodo.py file? (download skips if existing, update forces new download)")
@@ -40,11 +41,11 @@ class FolderStructureSegment(Segment):
                 args.data = "private"
         if not args.dodofile:
             f = args.folder / "dodo.py"
-            q = yesno(f"{'Update' if f.exists() else 'Download'} the template dodo.py file?", default=(not f.exists()))
+            q = yesno(f"{'Update (re-download)' if f.exists() else 'Download'} the template dodo.py file?", default=(not f.exists()))
             args.dodofile = "yes" if q else "no"
         if not args.gitignore:
             f = args.folder / ".gitignore"
-            q = yesno(f"{'Update' if f.exists() else 'Download'} the template .gitignore file?", default=(not f.exists()))
+            q = yesno(f"{'Update (re-download)' if f.exists() else 'Download'} the template .gitignore file?", default=(not f.exists()))
             args.gitignore = "yes" if q else "no"
         if not args.license:
             if (args.folder / "LICENSE").exists():
@@ -87,3 +88,8 @@ class FolderStructureSegment(Segment):
                 _download("LICENSE-MIT", licensefile)
             if args.license == "ccby":
                 _download("LICENSE-CC-BY", licensefile)
+
+    def check(self, args: Namespace):
+        yield "Data Folders", (args.folder / "data").exists()
+        yield "License file", (args.folder / "LICENSE").exists()
+        yield "dodo.py file", (args.folder / "dodo.py").exists()

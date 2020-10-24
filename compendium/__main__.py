@@ -1,25 +1,26 @@
 """
 Dodo Open Science Compendium - Commands to help create and maintain the compendium
 
-Use `dodo init --help` for information on how to create a new compendium
-Use `dodo --help` for a list of all available commands
+Use `compendium init --help` for information on how to create a new compendium
+Use `compendium --help` for a list of all available commands
 """
 import argparse
 import logging
 import sys
 from argparse import Namespace
 
-from dodo import init, encrypt
+from compendium import init, encrypt, check
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__, prog='dodo')
+    parser = argparse.ArgumentParser(description=__doc__, prog='compendium')
     parser.add_argument("--verbose", "-v", help="Verbose output", action="store_true")
     parser.add_argument("--quiet", "-q", help="Quiet (minimal output)", action="store_true")
     subparsers = parser.add_subparsers(help='Sub commands', dest='command')
     subparsers.required = True
     init.add_subparser(subparsers)
     encrypt.add_subparser(subparsers)
+    check.add_subparser(subparsers)
 
     if len(sys.argv) == 1:
         print(__doc__, file=sys.stderr)

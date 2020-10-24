@@ -10,7 +10,7 @@ import sys
 from setuptools import setup
 
 setup(name='compendium-dodo',
-      description='Compendium dodo - creating a compendium for reproducible science',
+      description='Compendium "dodo" - creating a compendium for reproducible science',
       version='0.0.2',
       license='MIT',
       author='Wouter van Atteveldt',
@@ -28,13 +28,13 @@ setup(name='compendium-dodo',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
         ],
-      packages=['dodo'],
+      packages=['compendium'],
       python_requires='>=3.5',
-      install_requires=["doit", "cryptography"],
+      install_requires=["doit", "cryptography", "requests"],
       long_description=__doc__,
       entry_points={
           'console_scripts': [
-              'dodo = dodo.__main__:main'
+              'compendium = compendium.__main__:main'
           ]
       },
       )

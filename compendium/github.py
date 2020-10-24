@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 import logging
 
-from dodo.segment import Segment, yesno, AbsolutePath
+from compendium.segment import Segment, yesno, AbsolutePath
 
 
 def check_github(repository: str) -> str:
