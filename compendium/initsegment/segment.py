@@ -33,7 +33,7 @@ class Segment:
         pass
 
     def run(self, args: Namespace):
-        """Run this segment"""
+        """Run this initsegment"""
         pass
 
     def check(self) -> Iterable[Tuple[str, bool]]:

@@ -8,7 +8,7 @@ from collections import defaultdict
 
 from compendium.command.command import CompendiumCommand
 from compendium.compendium import Compendium
-from compendium.segment import SEGMENTS
+from compendium.initsegment import SEGMENTS
 from compendium.util import contained_in
 
 _CHECK_OK = '\u2714\u2009'

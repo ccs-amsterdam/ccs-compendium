@@ -135,5 +135,5 @@ class Compendium:
             return TaskFailed("Incorrect password, could not decrypt files")
 
     def install_python_task(self):
-        from compendium.segment.pyenv import install_pyvenv
+        from compendium.initsegment.pyenv import install_pyvenv
         install_pyvenv(self.pyenv)

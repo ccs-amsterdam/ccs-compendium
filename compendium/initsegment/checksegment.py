@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 
-from compendium.segment.segment import Segment
+from compendium.initsegment.segment import Segment
 
 class CheckSegment(Segment):
     """Init segment to run the checks"""

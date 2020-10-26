@@ -5,7 +5,7 @@ from argparse import ArgumentParser, Namespace
 #from compendium.command.init import find_env
 from pathlib import Path
 
-from compendium.segment.segment import Segment
+from compendium.initsegment.segment import Segment
 from compendium.util import AbsolutePath, yesno, call
 
 

@@ -8,7 +8,7 @@ import requests
 import logging
 
 from compendium.compendium import Compendium, find_root, CONFIGFILE
-from compendium.segment.segment import Segment
+from compendium.initsegment.segment import Segment
 from compendium.util import yesno, AbsolutePath
 
 

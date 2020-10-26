@@ -4,7 +4,7 @@ import sys
 from argparse import Namespace
 
 from compendium.command.command import CompendiumCommand
-from compendium.segment import SEGMENTS
+from compendium.initsegment import SEGMENTS
 
 
 class Init(CompendiumCommand):
@@ -25,7 +25,7 @@ class Init(CompendiumCommand):
             except Exception as e:
                 print(f"Invalid argument: {e}", file=sys.stderr)
                 return
-        initial_segment = SEGMENTS[0]()  # initial segment is responsible for creating compendium
+        initial_segment = SEGMENTS[0]()  # initial initsegment is responsible for creating compendium
         initial_segment.interactive_arguments(args)
         compendium = initial_segment.run(args)
         for segment_class in SEGMENTS[1:]:

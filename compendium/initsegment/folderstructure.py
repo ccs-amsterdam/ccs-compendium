@@ -3,7 +3,7 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from urllib.request import urlretrieve
 
-from compendium.segment.segment import Segment
+from compendium.initsegment.segment import Segment
 from compendium.util import yesno
 
 
