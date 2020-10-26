@@ -1,47 +1,36 @@
-"""
-Generic checks for compendium completeness and consistence
-"""
+
 
 import logging
+import sys
 
-from argparse import Namespace, ArgumentParser
+from argparse import Namespace
+from collections import defaultdict
 
-from compendium.segment import AbsolutePath, Segment
-from compendium.init import get_segments
+from compendium.command.command import CompendiumCommand
+from compendium.compendium import Compendium
+from compendium.segment import SEGMENTS
+from compendium.util import contained_in
 
 _CHECK_OK = '\u2714\u2009'
 _CHECK_FAIL = '\u2718\u2009'
 
 
-def add_subparser(subparsers):
-    parser = subparsers.add_parser('check', help=__doc__)
-    parser.add_argument("folder", nargs="?", default=".", type=AbsolutePath,
-                        help="Compendium folder (default: current folder)")
+class Check(CompendiumCommand):
+    """
+    Generic checks for compendium completeness and consistence
+    """
+
+    @classmethod
+    def run(self, args: Namespace):
+        compendium = Compendium(args.folder)
+        run_checks(compendium)
 
 
-def run(args: Namespace):
-    if not args.folder:
-        raise ValueError("Cannot check without folder specified")
-    print(f"\nRunning checks on compendium {args.folder}:")
-    for segment in get_segments():
-        for check, outcome in segment.check(args):
+def run_checks(compendium: Compendium):
+    for segment in SEGMENTS:
+        for check, outcome in segment(compendium).check():
             print(f"[{_CHECK_OK if outcome else _CHECK_FAIL}] {check}")
 
-
-_run_check = run
-
-
-class CheckSegment(Segment):
-    """Init segment to run the check"""
-    ARGS = ["skipcheck"]
-
-    def add_arguments(self, parser: ArgumentParser):
-        parser.add_argument("--skipcheck", action="store_true",
-                            help="Skip the check after init")
-
-    def run(self, args: Namespace):
-        if not args.skipcheck:
-            _run_check(args)
 
 def get_cycles(graph):
     def cycles_node(graph, node, visited=None):

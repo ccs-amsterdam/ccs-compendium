@@ -7,51 +7,20 @@ from pathlib import Path
 import requests
 import logging
 
-from compendium.segment import Segment, yesno, AbsolutePath
-
-
-def check_github(repository: str) -> str:
-    """Check if the repository is valid and exists, returning full URL"""
-    if not repository.startswith("https://"):
-        if not re.match(r"\w+/\w+", repository):
-            raise ValueError("Invalid repository name, format should be full repository URL or userame/repository")
-        repository = f"https://github.com/{repository}"
-    resp = requests.head(repository)
-    if resp.status_code != 200:
-        raise ValueError(
-            f"Repository does not exist or access denied (url: {repository}, status: {resp.status_code}")
-    return repository
-
-
-def github_folder_name(repository: str) -> str:
-    print(repository)
-    name = repository.rsplit("/", maxsplit=1)[-1]
-    if name.endswith(".git"):
-        name = name[:-len(".git")]
-    return name
-
-
-def get_github_name():
-    while True:
-        name = input(
-            "Name of an existing github repository to link to (url or username/repository, leave empty to cancel): ").strip()
-        if not name:
-            return
-        try:
-            return check_github(name)
-        except ValueError as e:
-            print(str(e), file=sys.stderr)
-            continue
+from compendium.compendium import Compendium, find_root, CONFIGFILE
+from compendium.segment.segment import Segment
+from compendium.util import yesno, AbsolutePath
 
 
 class GithubSegment(Segment):
-    def add_arguments(self, parser: ArgumentParser):
-        parser.add_argument("folder", nargs="?", type=AbsolutePath,
-                        help="Name of the compendium folder (. for current folder, omit to use github folder)")
+    @classmethod
+    def add_arguments(cls, parser: ArgumentParser):
         parser.add_argument("--github",
                         help="Link compendium to github repository (URL or username/repository)")
 
-    def check_arguments(self, args: Namespace):
+    @classmethod
+    def check_arguments(cls, args: Namespace):
+        super().check_arguments(args)
         for arg in 'github', 'folder':
             if not hasattr(args, arg):
                 setattr(args, arg, None)
@@ -60,19 +29,27 @@ class GithubSegment(Segment):
         if args.github and not check_github(args.github):
             raise ValueError(f"Github repository invalid: {args.github}")
 
+    def __init__(self, compendium: Compendium = None):
+        """Allow compendium to be None for this segment"""
+        super().__init__(compendium)
+
     def interactive_arguments(self, args: Namespace):
-        # check if project folder has .git, in that case use it and ignore github flag
-        if args.folder:
-            if (args.folder / ".git").exists():
-                if args.github:
-                    logging.info(f"Compendium folder {args.folder} is already git repository, so ignoring github link")
-                    args.github = None
-                return
-        elif (Path.cwd()/".git").exists():
-            if yesno(f"Current folder {Path.cwd()} is a git repository, use it as the project folder?", default=True):
-                args.folder = Path.cwd()
+        # Can we find the root folder?
+        try:
+            args.folder = find_root(args.folder)
+            logging.info(f"Found project root folder at {args.folder}")
+        except ValueError:
+            if (args.folder/".git").exists():
+                if yesno(f"{args.folder} is a git repository, use it as the project folder?",
+                         default=True):
+                    args.github = None  # No need to clone/initialize github repo
+                    return
+
+        if (args.folder / ".git").exists():
+            if args.github:
+                logging.info(f"Compendium folder {args.folder} is already git repository, so ignoring github link")
                 args.github = None
-                return
+            return
 
         # Check whether user wants to use github
         if (not args.github) and yesno("Link the compendium to a github repository?", default=True):
@@ -109,7 +86,7 @@ class GithubSegment(Segment):
                     print("Aborted", file=sys.stderr)
                     sys.exit(1)
 
-    def run(self, args: Namespace):
+    def run(self, args: Namespace) -> Compendium:
         if args.github:
             if not args.github.startswith("https://"):
                 args.github = f"https://github.com/{args.github}"
@@ -132,3 +109,43 @@ class GithubSegment(Segment):
                 logging.info(f"Creating compendium folder at {args.folder}")
                 args.folder.mkdir()
 
+        if (args.folder/CONFIGFILE).exists():
+            self.compendium = Compendium(args.folder)
+        else:
+            self.compendium = Compendium(args.folder, create_new_config=True)
+        return self.compendium
+
+
+
+def check_github(repository: str) -> str:
+    """Check if the repository is valid and exists, returning full URL"""
+    if not repository.startswith("https://"):
+        if not re.match(r"\w+/\w+", repository):
+            raise ValueError("Invalid repository name, format should be full repository URL or userame/repository")
+        repository = f"https://github.com/{repository}"
+    resp = requests.head(repository)
+    if resp.status_code != 200:
+        raise ValueError(
+            f"Repository does not exist or access denied (url: {repository}, status: {resp.status_code}")
+    return repository
+
+
+def github_folder_name(repository: str) -> str:
+    print(repository)
+    name = repository.rsplit("/", maxsplit=1)[-1]
+    if name.endswith(".git"):
+        name = name[:-len(".git")]
+    return name
+
+
+def get_github_name():
+    while True:
+        name = input(
+            "Name of an existing github repository to link to (url or username/repository, leave empty to cancel): ").strip()
+        if not name:
+            return
+        try:
+            return check_github(name)
+        except ValueError as e:
+            print(str(e), file=sys.stderr)
+            continue

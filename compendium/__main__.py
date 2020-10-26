@@ -7,29 +7,31 @@ Use `compendium --help` for a list of all available commands
 import argparse
 import logging
 import sys
-from argparse import Namespace
 
-from compendium import init, encrypt, check
+from compendium.command import init, check, encrypt, COMMANDS, get_command
+from compendium.util import AbsolutePath
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, prog='compendium')
     parser.add_argument("--verbose", "-v", help="Verbose output", action="store_true")
     parser.add_argument("--quiet", "-q", help="Quiet (minimal output)", action="store_true")
+    parser.add_argument("--folder", "-f", help="Compendium root folder (default: current folder or parent)",
+                        default=".", type=AbsolutePath)
     subparsers = parser.add_subparsers(help='Sub commands', dest='command')
     subparsers.required = True
-    init.add_subparser(subparsers)
-    encrypt.add_subparser(subparsers)
-    check.add_subparser(subparsers)
+    for command in COMMANDS:
+        command.add_subparser(subparsers)
 
     if len(sys.argv) == 1:
         print(__doc__, file=sys.stderr)
     args = parser.parse_args()
-
+    print(args)
     level = (logging.DEBUG if args.verbose else (logging.WARN if args.quiet else logging.INFO))
     logging.basicConfig(level=level, format='[%(levelname)-5s] %(message)s')
 
-    globals()[args.command].run(args)
+    cmd = get_command(args.command)
+    cmd.run(args)
 
 
 if __name__ == '__main__':
