@@ -11,7 +11,7 @@ from setuptools import setup
 
 setup(name='compendium-dodo',
       description='Compendium "dodo" - creating a compendium for reproducible science',
-      version='0.0.2',
+      version='0.0.3',
       license='MIT',
       author='Wouter van Atteveldt',
       author_email='wouter@vanatteveldt.com',
