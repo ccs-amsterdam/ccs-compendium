@@ -41,7 +41,6 @@ def task_decrypt():
     files = list(compendium.folders.DATA_ENCRYPTED.glob("*"))
     for inf in files:
         outf = compendium.folders.DATA_PRIVATE/inf.name
-        print(outf.exists(), outf)
         yield {
             'name': outf,
             'targets': [outf],
@@ -54,7 +53,6 @@ def task_process():
     """Create tasks for the processing scripts in src/data-processing"""
     compendium = Compendium()
     for action in compendium.get_actions():
-
         result = dict(
             basename=f"process:{action.file.name}",
             targets=action.targets,
@@ -66,7 +64,6 @@ def task_process():
             result['file_dep'] = action.inputs
         else:
             result['uptodate'] = [True]  # task is up-to-date if target exists
-        print(result)
         yield result
 
 
