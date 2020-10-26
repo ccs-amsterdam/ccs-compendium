@@ -36,16 +36,16 @@ class GithubSegment(Segment):
     def interactive_arguments(self, args: Namespace):
         # Can we find the root folder?
         try:
-            args.folder = find_root(args.folder)
+            folder = args.folder or Path.cwd()
+            args.folder = find_root(folder)
             logging.info(f"Found project root folder at {args.folder}")
-        except ValueError:
-            if (args.folder/".git").exists():
+        except FileNotFoundError:
+            if (folder/".git").exists():
                 if yesno(f"{args.folder} is a git repository, use it as the project folder?",
                          default=True):
                     args.github = None  # No need to clone/initialize github repo
                     return
-
-        if (args.folder / ".git").exists():
+        if args.folder and (args.folder / ".git").exists():
             if args.github:
                 logging.info(f"Compendium folder {args.folder} is already git repository, so ignoring github link")
                 args.github = None
@@ -131,7 +131,6 @@ def check_github(repository: str) -> str:
 
 
 def github_folder_name(repository: str) -> str:
-    print(repository)
     name = repository.rsplit("/", maxsplit=1)[-1]
     if name.endswith(".git"):
         name = name[:-len(".git")]

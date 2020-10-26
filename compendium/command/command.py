@@ -1,4 +1,5 @@
 from argparse import Namespace
+from pathlib import Path
 
 from compendium.compendium import Compendium
 
@@ -28,7 +29,7 @@ class CompendiumCommand:
 
     @classmethod
     def run(cls, args: Namespace):
-        compendium = Compendium(args.folder)
+        compendium = Compendium(args.folder or Path.cwd())
         cls.do_run(compendium, args)
         compendium.save()
 

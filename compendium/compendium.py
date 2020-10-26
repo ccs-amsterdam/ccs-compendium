@@ -36,7 +36,7 @@ def find_root(folder: Path) -> Path:
     for f in [folder] + list(folder.parents):
         if (f / CONFIGFILE).exists():
             return f
-    raise FileNotFoundError(f"Cannot find compendium folder (starting from {folder}")
+    raise FileNotFoundError(f"Cannot find compendium folder (starting from {folder})")
 
 
 class Compendium:
@@ -88,7 +88,9 @@ class Compendium:
 
     @property
     def pyenv(self) -> Path:
-        return self.root / self.cf.get("python", "env", fallback=None)
+        env = self.cf.get("python", "env", fallback=None)
+        if env:
+            return self.root / env
 
     @pyenv.setter
     def pyenv(self, env: Path):

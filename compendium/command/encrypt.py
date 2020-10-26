@@ -47,7 +47,9 @@ class Encrypt(CompendiumCommand):
         if not args.password:
             print("No password given, aborting", file=sys.stderr)
             sys.exit(1)
-
+        if not compendium.folders.DATA_ENCRYPTED.exists():
+            logging.debug(f"Creating {compendium.folders.DATA_ENCRYPTED}")
+            compendium.folders.DATA_ENCRYPTED.mkdir()
         key = get_key(compendium.salt, args.password)
         action = 'Encrypting' if not args.verify else 'Verifying'
         logging.info(f"{action} {len(files)} file(s) from {_l(compendium.folders.DATA_PRIVATE)}")
@@ -66,7 +68,6 @@ class Encrypt(CompendiumCommand):
 
 def get_files(folder: Path, files: Optional[Iterable[str]]):
     if not files:
-        print(folder, list(folder.glob("*")))
         yield from folder.glob("*")
     else:
         for file in files:

@@ -17,7 +17,7 @@ def main():
     parser.add_argument("--verbose", "-v", help="Verbose output", action="store_true")
     parser.add_argument("--quiet", "-q", help="Quiet (minimal output)", action="store_true")
     parser.add_argument("--folder", "-f", help="Compendium root folder (default: current folder or parent)",
-                        default=".", type=AbsolutePath)
+                        type=AbsolutePath)
     subparsers = parser.add_subparsers(help='Sub commands', dest='command')
     subparsers.required = True
     for command in COMMANDS:
@@ -26,7 +26,6 @@ def main():
     if len(sys.argv) == 1:
         print(__doc__, file=sys.stderr)
     args = parser.parse_args()
-    print(args)
     level = (logging.DEBUG if args.verbose else (logging.WARN if args.quiet else logging.INFO))
     logging.basicConfig(level=level, format='[%(levelname)-5s] %(message)s')
 

@@ -8,6 +8,7 @@ from compendium.util import yesno
 
 
 def _download(fn: str, dest: Path):
+    dest.parent.mkdir(exist_ok=True)
     url = f"https://raw.githubusercontent.com/vanatteveldt/compendium-dodo/main/templates/{fn}"
     logging.info(f"Downloading {url} to {dest}")
     urlretrieve(url, dest)
@@ -46,8 +47,7 @@ class FolderStructureSegment(Segment):
                 args.data = "private"
             args.src = "yes" if yesno("Create source folders for analysis scripts?", default=True) else "no"
             if "no" not in (args.src, args.data):
-                args.sample = "yes" if yesno("Download example files from template?", default=False) else "no"
-
+                args.examplefiles = "yes" if yesno("Download example files from template?", default=False) else "no"
 
         def _askdownload(file: Path):
             return (not file.exists()) and yesno(f"Download the template {file.name} file?", default=True)
