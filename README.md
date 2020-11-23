@@ -1,6 +1,6 @@
 # `ccs-compendium`: Utility for building a compendium for reprocible science 
 
-`compendium` is a python module that helps you build a *compendium* containing the data and scripts needed to reproduce your article, report, or analysis.
+`ccs-compendium` is a python module that helps you build a *compendium* containing the data and scripts needed to reproduce your article, report, or analysis.
 Although the module is written in python and uses the python [doit](https://pydoit.org/) tool, it also works if you use R or other tools for your analysis. 
 Please see *[website]* for more information. 
 
