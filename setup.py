@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-Dodo Open Science Compendium - Commands to help create and maintain the compendium
+CCS Compendium - Commands to help create and maintain an open science compendium
 """
 
 from __future__ import print_function
@@ -9,8 +9,8 @@ import sys
 
 from setuptools import setup
 
-setup(name='compendium-dodo',
-      description='Compendium "dodo" - creating a compendium for reproducible science',
+setup(name='ccs-compendium',
+      description='CCS Compendium - creating a compendium for reproducible science',
       version='0.0.6',
       license='MIT',
       author='Wouter van Atteveldt',
@@ -29,7 +29,7 @@ setup(name='compendium-dodo',
         'Topic :: Scientific/Engineering',
         ],
       packages=['compendium', 'compendium.command', 'compendium.initsegment'],
-      python_requires='>=3.5',
+      python_requires='>=3.6',
       install_requires=["doit", "cryptography", "requests"],
       long_description=__doc__,
       entry_points={
